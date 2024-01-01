@@ -1,0 +1,30 @@
+.container{
+    padding: 1.5rem;
+    background-color: rgb(36,36,36);
+}
+
+/* Styles for mobile devices */
+.container__categories{
+    display: flex;
+    overflow-x: auto;
+    margin-top: 1.7rem;
+    gap: .7rem;
+}
+
+.logo{
+    width: 50%;
+}
+
+/* Media query for tablets */
+@media (min-width: 768px) {
+  .logo{
+    width: 20%;
+}
+}
+
+/* Media query for desktops */
+@media (min-width: 1024px) {
+    .logo{
+        width: 15%;
+    }
+}
