@@ -1,1 +1,1 @@
-export const genreArray = ["All", "Action", "comedy", "Horror", "Drama", "Sci-fi"];
+export const genreArray = ["All", "Action", "Comedy", "Horror", "Drama", "Sci-fi"];

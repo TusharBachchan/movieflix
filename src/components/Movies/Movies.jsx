@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import MovieCard from "../MovieCard/MovieCard";
 import MoviesCss from "./Movies.module.css";
 import Shimmer from "../Shimmer/Shimmer";
-const Movies = ({ selectedGenre }) => {
+import { useSelector } from "react-redux";
+
+const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentYear, setCurrentYear] = useState(2012);
 
+  const selectedGenre = useSelector((state) => state.genre.selectedGenre);
+  const previousGenre = useSelector((state) => state.genre.previousGenre);
   // To get specific genre id : default: All, else user will select from header component
   const getGenreId = (selectedGenre) => {
     // Map genre names to corresponding TMDb genre ids
@@ -18,20 +22,20 @@ const Movies = ({ selectedGenre }) => {
       Drama: 18,
       "Sci-fi": 878,
     };
-
+    console.log(genreMap[selectedGenre]);
     return genreMap[selectedGenre];
   };
 
-// 
-const getDirector = (crew) => {
-  const director = crew.find((member) => member.job === "Director");
-  return director ? director.name : "Unknown";
-};
-
+  //
+  const getDirector = (crew) => {
+    const director = crew.find((member) => member.job === "Director");
+    return director ? director.name : "Unknown";
+  };
 
   const fetchMovies = async (currentYear, selectedGenre) => {
     try {
       const genreId = getGenreId(selectedGenre);
+
       const response = await fetch(
         `https://api.themoviedb.org/3/discover/movie?api_key=2dca580c2a14b55200e784d157207b4d&sort_by=popularity.desc&primary_release_year=${currentYear}&page=1&vote_count.gte=100&with_genres=${genreId}`
       );
@@ -48,7 +52,7 @@ const getDirector = (crew) => {
           }
 
           const detailsData = await detailsResponse.json();
-          console.log("otherApi : ", detailsData);
+          // console.log("otherApi : ", detailsData);
           return {
             ...movie,
             cast: detailsData.credits.cast,
@@ -57,40 +61,58 @@ const getDirector = (crew) => {
           };
         })
       );
-      setMovies((prevMovies) => [...prevMovies, ...detailedMovies]);
-      console.log(detailedMovies);
+      // if (selectedGenre !== previousGenre)
+      // setMovies(detailedMovies);
+      // if(selectedGenre !== previousGenre){
+      //   setMovies([]);
+      // }
+      setMovies([...movies, detailedMovies]);
+      // setMovies([...movies, detailedMovies]);
       setLoading(true);
-      // setCurrentYear(currentYear)
+      console.log("movies", movies);
+      console.log("detailedMovies", detailedMovies);
+
+        // return detailedMovies;
+
+      // setCurrentYear((prevYear) => )
     } catch (error) {
       console.error("Error fetching movies by genre:", error);
+      // return [];
     }
   };
 
-
   useEffect(() => {
     fetchMovies(currentYear, selectedGenre);
-    // console.log(movies);
-    console.log(currentYear)
-  }, [currentYear, selectedGenre]);
+    console.log("movies", movies);
 
-
+    // console.log(currentYear)
+  }, [selectedGenre]);
 
   const handleScroll = () => {
     const scrollPosition = window.scrollY;
     const windowHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
-
+    let direction = ""
     // Check if the user has scrolled to the bottom
-    if (scrollPosition + windowHeight >= documentHeight) {
+    if (
+      scrollPosition + windowHeight >= documentHeight &&
+      currentYear <= 2022
+    ) {
       // User has scrolled to the bottom, load movies for the next year
-      fetchMovies(currentYear + 1);
+      setCurrentYear((prevYear) => prevYear + 1);
+      // setCurrentYear(currentYear + 1);
+      direction = "up"
+      fetchMovies(currentYear);
     }
 
     // Check if the user has scrolled to the top
-    if (scrollPosition === 0 && currentYear > 2010) {
-      // User has scrolled to the top, load movies for the previous year
-      fetchMovies(currentYear - 1);
-    }
+    // if (scrollPosition === 0 && currentYear > 2012) {
+    //   // User has scrolled to the top, load movies for the previous year
+    //   // setCurrentYear((prev) => prev - 1);
+    //   setCurrentYear(currentYear - 1);
+
+    //   fetchMovies(currentYear);
+    // }
   };
 
   useEffect(() => {
@@ -103,19 +125,40 @@ const getDirector = (crew) => {
   return !loading ? (
     <Shimmer />
   ) : (
-    <div className={MoviesCss.container}>
-      <h3>{currentYear}</h3>
-      <div className={MoviesCss.cards__container}>
-        {movies.map((movie) => (
-            <MovieCard
-              title={movie.original_title}
-              rating="5"
-              image={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
-              key={movie.id}
-            />
-        ))}
-      </div>
-    </div>
+    <>
+      {movies.map((movieArr, idx) => (
+        <div className={MoviesCss.container} key={idx}>
+          <h3>{movieArr[0].release_date.slice(0, 4)}</h3>
+          <h3>{selectedGenre}</h3>
+          <div className={MoviesCss.cards__container}>
+            {movieArr.map((movie, index) => (
+              <MovieCard
+                title={movie.original_title}
+                rating="5"
+                image={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+                year={movie.release_date.slice(0, 4)}
+                key={index}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+    // <div className={MoviesCss.container}>
+    //   <h3>{currentYear}</h3>
+    //   <h3>{selectedGenre}</h3>
+    //   <div className={MoviesCss.cards__container}>
+    //     {movies.map((movie, index) => (
+    //       <MovieCard
+    //         title={movie.original_title}
+    //         rating="5"
+    //         image={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+    //         year={movie.release_date.slice(0, 4)}
+    //         key={index}
+    //       />
+    //     ))}
+    //   </div>
+    // </div>
   );
 };
 
