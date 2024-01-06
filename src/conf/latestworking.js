@@ -10,7 +10,6 @@ const Movies = () => {
     const [currentYear, setCurrentYear] = useState(2012);
 
     const selectedGenre = useSelector((state) => state.genre.selectedGenre);
-    const previousGenre = useSelector((state) => state.genre.previousGenre);
     // To get specific genre id : default: All, else user will select from header component
     const getGenreId = (selectedGenre) => {
         // Map genre names to corresponding TMDb genre ids

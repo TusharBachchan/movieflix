@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 import { selectGenre } from '../store/genreSlice';
 
-const Button = ({genre, onGenreClick, activeGenre}) => {
+const Button = ({genre, activeGenre}) => {
   const dispatch = useDispatch()
   return (
     <button

@@ -7,19 +7,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectGenre } from "../../store/genreSlice";
 
 
-const Header = ({ setSelectedGenre }) => {
+const Header = () => {
   const [activeGenre, setActiveGenre] = useState(null);
-  const selectedGenre = useSelector((state) => state.genre.selectedGenre)
-  const previousGenre = useSelector((state) => state.genre.previousGenre);
-  
   return (
     <div className={HeaderCSS.container}>
       <div className={HeaderCSS.container__logo}>
         <img src={Logo} alt="" className={HeaderCSS.logo} />
       </div>
       <div className={HeaderCSS.container__categories}>
-        <h3 style={{ color: "gray" }}>{previousGenre}</h3>
-        <h3 style={{ color: "white" }}>{selectedGenre}</h3>
         {genreArray.map((item) => (
           <Button genre={item} key={item} />
         ))}
